@@ -15,3 +15,21 @@ export async function getCabins() {
     }
   }
 }
+
+export async function deleteCabin(id: number) {
+  try {
+    const { data, error } = await supabase.from("cabins").delete().eq("id", id);
+
+    if (error) {
+      throw error;
+    }
+
+    return data;
+  } catch (error) {
+    if (error instanceof PostgrestError) {
+      console.error("Error deleting cabin", error.code, error.message);
+      throw error;
+    }
+    throw error;
+  }
+}
