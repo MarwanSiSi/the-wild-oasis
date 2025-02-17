@@ -16,6 +16,12 @@ const StyledDiv = styled.div`
   grid-template-rows: auto 1fr;
 `;
 
+const Container = styled.div`
+  max-width: 120rem;
+  margin-left: auto;
+  margin-right: auto;
+`;
+
 export default function AppLayout() {
   return (
     <StyledDiv>
@@ -23,7 +29,9 @@ export default function AppLayout() {
       <Sidebar />
 
       <Main>
-        <Outlet />
+        <Container>
+          <Outlet />
+        </Container>
       </Main>
     </StyledDiv>
   );

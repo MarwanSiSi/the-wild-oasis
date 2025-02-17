@@ -1,4 +1,5 @@
 import { formatDistance, parseISO, differenceInDays } from "date-fns";
+import { toast } from "sonner";
 
 // We want to make this function work for both Date objects and strings (which come from Supabase)
 export const subtractDates = (dateStr1: Date, dateStr2: Date) =>
@@ -27,3 +28,30 @@ export const formatCurrency = (value: number) =>
   new Intl.NumberFormat("en", { style: "currency", currency: "USD" }).format(
     value
   );
+
+export function showSuccessToast(message: string) {
+  return toast.success(message, {});
+}
+
+export function showErrorToast(message: string) {
+  return toast.error(message, {});
+}
+
+export function showLoadingToast(message: string) {
+  return toast.loading(message, {});
+}
+
+export function showPromiseToast(
+  promise: Promise<unknown>,
+  messages: {
+    success: string;
+    error: string;
+    loading: string;
+  }
+) {
+  toast.promise(promise, {
+    loading: messages.loading,
+    success: messages.success,
+    error: messages.error,
+  });
+}

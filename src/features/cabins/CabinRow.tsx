@@ -2,11 +2,17 @@
 
 import styled from "styled-components";
 import { Cabin as CabinType } from "../../types/cabin";
-import { formatCurrency } from "../../utils/helpers";
+import {
+  formatCurrency,
+  showErrorToast,
+  showLoadingToast,
+  showSuccessToast,
+} from "../../utils/helpers";
 import { deleteCabin } from "../../services/apiCabins";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import SpinnerMini from "../../ui/SpinnerMini";
+import { useMutation } from "@tanstack/react-query";
 import { PostgrestError } from "@supabase/supabase-js";
+import { toast } from "sonner";
+import { useUseQueryClient } from "../../hooks/useUseQueryClient";
 
 const TableRow = styled.div`
   display: grid;
@@ -57,23 +63,36 @@ export default function CabinRow({ cabin }: { cabin: CabinType }) {
     image,
   } = cabin;
 
-  const queryClient = useQueryClient();
+  const { invalidateQuery } = useUseQueryClient();
 
   const { isPending: isDeleting, mutate } = useMutation({
     mutationFn: (cabinId: number) => deleteCabin(cabinId),
 
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ["cabins"],
-      });
+    onMutate: () => {
+      const loadingToastId = showLoadingToast("Deleting cabin");
+
+      return { loadingToastId };
     },
 
-    onError: (error: PostgrestError) => {
-      alert(error.message);
+    onSuccess: (_, __, context) => {
+      // Dismiss the loading toast
+      toast.dismiss(context.loadingToastId);
+
+      showSuccessToast("Cabin deleted successfully");
+
+      // Invalidate the cabins query to refresh the data
+      invalidateQuery(["cabins"]);
+    },
+
+    onError: (error: PostgrestError, _, context) => {
+      console.log(context);
+      toast.dismiss(context?.loadingToastId);
+
+      showErrorToast("Error deleting cabin");
+
+      console.error("Error deleting cabin", error);
     },
   });
-
-  if (isDeleting) return <SpinnerMini />;
 
   return (
     <TableRow role="row">

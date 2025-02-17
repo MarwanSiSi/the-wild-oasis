@@ -1,5 +1,3 @@
-// import styled from "styled-components";
-
 import { useQuery } from "@tanstack/react-query";
 import { getCabins } from "../../services/apiCabins";
 import Spinner from "../../ui/Spinner";
@@ -13,6 +11,8 @@ const Table = styled.div`
   background-color: var(--color-grey-0);
   border-radius: 7px;
   overflow: hidden;
+  width: 100%;
+  height: 100%;
 `;
 
 const TableHeader = styled.header`
