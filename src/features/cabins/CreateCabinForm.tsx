@@ -1,57 +1,14 @@
-import styled from "styled-components";
-
 import Input from "../../ui/Input";
 import Form from "../../ui/Form";
 import Button from "../../ui/Button";
 import FileInput from "../../ui/FileInput";
 import Textarea from "../../ui/Textarea";
 import { useForm, FieldErrors, FieldValues } from "react-hook-form";
-import { addCabin } from "../../services/apiCabins";
-import { useMutation } from "@tanstack/react-query";
-import {
-  showErrorToast,
-  showLoadingToast,
-  showSuccessToast,
-} from "../../utils/helpers";
-import { toast } from "sonner";
-import { PostgrestError } from "@supabase/supabase-js";
+import FormRow from "../../ui/FormRow";
+import styled from "styled-components";
+import { useCreateCabin } from "./hooks/useCreateCabin";
+import { useUpdateCabin } from "./hooks/useUpdateCabin";
 import { useUseQueryClient } from "../../hooks/useUseQueryClient";
-
-const FormRow = styled.div`
-  display: grid;
-  align-items: center;
-  grid-template-columns: 24rem 1fr 1.2fr;
-  gap: 2.4rem;
-
-  padding: 1.2rem 0;
-
-  &:first-child {
-    padding-top: 0;
-  }
-
-  &:last-child {
-    padding-bottom: 0;
-  }
-
-  &:not(:last-child) {
-    border-bottom: 1px solid var(--color-grey-100);
-  }
-
-  &:has(button) {
-    display: flex;
-    justify-content: flex-end;
-    gap: 1.2rem;
-  }
-`;
-
-const Label = styled.label`
-  font-weight: 500;
-`;
-
-// const Error = styled.span`
-//   font-size: 1.4rem;
-//   color: var(--color-red-700);
-// `;
 
 type FormData = {
   name: string;
@@ -62,37 +19,47 @@ type FormData = {
   image: FileList;
 };
 
-function CreateCabinForm() {
-  const { invalidateQuery } = useUseQueryClient();
+const StyledFlexContainer = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  gap: 1.2rem;
+`;
 
-  const { register, handleSubmit, reset } = useForm<FormData>();
+function CreateCabinForm({ cabinToEdit = {} }: { cabinToEdit?: FieldValues }) {
+  const { id: editId, ...editValues } = cabinToEdit ?? {};
 
-  const { mutate, isPending: isCreating } = useMutation({
-    mutationFn: addCabin,
+  const isEditSession = Boolean(editId);
 
-    onMutate: () => {
-      const loadingToastId = showLoadingToast("Adding cabin...");
-
-      return { loadingToastId };
-    },
-    onError: (error: PostgrestError, _, context) => {
-      toast.dismiss(context?.loadingToastId);
-
-      showErrorToast(error.message);
-    },
-    onSuccess: (_, __, context) => {
-      toast.dismiss(context?.loadingToastId);
-
-      showSuccessToast("Cabin added successfully!");
-
-      invalidateQuery(["cabins"]);
-
-      reset(); // Reset the form
-    },
+  const {
+    register,
+    handleSubmit,
+    reset,
+    getValues,
+    formState: { errors },
+  } = useForm<FormData>({
+    defaultValues: isEditSession
+      ? {
+          ...editValues,
+          discount: editValues.discount ?? 0,
+          description: editValues.description ?? "",
+        }
+      : {},
   });
 
+  const { invalidateQuery } = useUseQueryClient();
+
+  const { isCreating, addCabin } = useCreateCabin(reset, invalidateQuery);
+
+  const { isUpdating, updateCabin } = useUpdateCabin(invalidateQuery);
+
   function onSubmit(data: FieldValues) {
-    mutate(data);
+    const image = typeof data.image === "string" ? data.image : data.image[0];
+
+    if (isEditSession) {
+      console.log({ data: { ...data, image }, id: editId });
+
+      updateCabin({ data: { ...data, image }, id: editId });
+    } else addCabin({ data, image: image });
   }
 
   function onError(errors: FieldErrors<FormData>) {
@@ -101,53 +68,95 @@ function CreateCabinForm() {
 
   return (
     <Form onSubmit={handleSubmit(onSubmit, onError)}>
-      <FormRow>
-        <Label htmlFor="name">Cabin name</Label>
-        <Input type="text" id="name" {...register("name")} />
+      <FormRow label="Name" errorMsg={errors?.name?.message as string}>
+        <Input
+          type="text"
+          id="name"
+          disabled={isCreating}
+          {...register("name", {
+            required: "This field is required",
+          })}
+        />
       </FormRow>
-
-      <FormRow>
-        <Label htmlFor="maxCapacity">Maximum capacity</Label>
-        <Input type="number" id="maxCapacity" {...register("maxCapacity")} />
+      <FormRow
+        label="Maximum capacity"
+        errorMsg={errors?.maxCapacity?.message as string}
+      >
+        <Input
+          type="number"
+          id="maxCapacity"
+          disabled={isCreating}
+          {...register("maxCapacity", {
+            required: "This field is required",
+            min: {
+              value: 1,
+              message: "Capacity should be at least 1",
+            },
+          })}
+        />
       </FormRow>
-
-      <FormRow>
-        <Label htmlFor="regularPrice">Regular price</Label>
-        <Input type="number" id="regularPrice" {...register("regularPrice")} />
+      <FormRow
+        label="Regular price"
+        errorMsg={errors?.regularPrice?.message as string}
+      >
+        <Input
+          type="number"
+          id="regularPrice"
+          disabled={isCreating}
+          {...register("regularPrice", {
+            required: "This field is required",
+            min: {
+              value: 1,
+              message: "Capacity should be at least 1",
+            },
+          })}
+        />
       </FormRow>
-
-      <FormRow>
-        <Label htmlFor="discount">Discount</Label>
+      <FormRow label="Discount" errorMsg={errors?.discount?.message as string}>
         <Input
           type="number"
           id="discount"
+          disabled={isCreating}
           defaultValue={0}
-          {...register("discount")}
+          {...register("discount", {
+            required: "This field is required",
+
+            validate: (value) =>
+              Number(value) < Number(getValues().regularPrice) ||
+              "Discount should be less than the regular price",
+          })}
         />
       </FormRow>
-
-      <FormRow>
-        <Label htmlFor="description">Description for website</Label>
+      <FormRow
+        label="Description"
+        errorMsg={errors?.description?.message as string}
+      >
         <Textarea
           type="number"
           id="description"
+          disabled={isCreating}
           defaultValue=""
           {...register("description")}
         />
       </FormRow>
-
-      <FormRow>
-        <Label htmlFor="image">Cabin photo</Label>
-        <FileInput id="image" accept="image/*" {...register("image")} />
+      <FormRow label="Cabin Photo" errorMsg={errors?.image?.message as string}>
+        <FileInput
+          id="image"
+          disabled={isCreating}
+          accept="image/*"
+          {...register("image", {
+            required: isEditSession ? false : "This field is required",
+          })}
+        />
       </FormRow>
-
-      <FormRow>
-        {/* type is an HTML attribute! */}
+      <StyledFlexContainer>
         <Button variation="secondary" type="reset">
           Cancel
         </Button>
-        <Button disabled={isCreating}>Add cabin</Button>
-      </FormRow>
+        <Button disabled={isCreating || isUpdating}>
+          {isEditSession ? "Update Cabin" : "Create Cabin"}
+        </Button>
+      </StyledFlexContainer>
     </Form>
   );
 }

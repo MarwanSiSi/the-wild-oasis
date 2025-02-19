@@ -56,6 +56,25 @@ const GlobalStyles = createGlobalStyle`
   --image-opacity: 100%;
 }
 
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 1.2rem;
+}
+
+::-webkit-scrollbar-track {
+  background-color: var(--color-grey-0);
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: var(--color-grey-300);
+  border-radius: 0.6rem;
+  border: 3px solid var(--color-grey-0);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: var(--color-grey-400);
+}
+
 *,
 *::before,
 *::after {
