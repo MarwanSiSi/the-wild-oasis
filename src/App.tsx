@@ -20,7 +20,7 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <Toaster
-        // position="top-right"
+        position="top-right"
         visibleToasts={1}
         richColors
         toastOptions={{
