@@ -9,7 +9,10 @@ import {
 import { toast } from "sonner";
 import { PostgrestError } from "@supabase/supabase-js";
 
-export function useUpdateCabin(invalidateQuery: (query: string[]) => void) {
+export function useUpdateCabin(
+  invalidateQuery: (query: string[]) => void,
+  onCloseModal?: () => void
+) {
   const { mutate: updateCabin, isPending: isUpdating } = useMutation({
     mutationFn: ({ data, id }: { data: FieldValues; id: number }) =>
       createEditFunction(data, id),
@@ -25,6 +28,9 @@ export function useUpdateCabin(invalidateQuery: (query: string[]) => void) {
       toast.dismiss(context.loadingToastId);
 
       showSuccessToast("Cabin Updated successfully");
+
+      // Close the modal
+      onCloseModal?.();
 
       // Invalidate the cabins query to refresh the data
       invalidateQuery(["cabins"]);

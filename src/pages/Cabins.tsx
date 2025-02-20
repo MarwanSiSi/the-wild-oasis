@@ -2,9 +2,7 @@ import Heading from "../ui/Heading";
 import FlexContainer from "../ui/FlexContainer";
 import CabinTable from "../features/cabins/CabinTable";
 import styled from "styled-components";
-import Button from "../ui/Button";
-import { useState } from "react";
-import CreateCabinForm from "../features/cabins/CreateCabinForm";
+import AddCabin from "../features/cabins/AddCabin";
 
 const StyledDiv = styled.div`
   display: flex;
@@ -14,8 +12,6 @@ const StyledDiv = styled.div`
   width: 100%;
 `;
 function Cabins() {
-  const [showForm, setShowForm] = useState(false);
-
   return (
     <>
       <FlexContainer orientation="horizontal">
@@ -27,10 +23,7 @@ function Cabins() {
       <FlexContainer>
         <CabinTable />
 
-        <Button onClick={() => setShowForm((prev) => !prev)}>
-          Add new Cabin
-        </Button>
-        {showForm && <CreateCabinForm />}
+        <AddCabin />
       </FlexContainer>
     </>
   );

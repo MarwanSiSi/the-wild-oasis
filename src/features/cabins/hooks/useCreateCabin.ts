@@ -11,7 +11,8 @@ import { useUseQueryClient } from "../../../hooks/useUseQueryClient";
 
 export function useCreateCabin(
   reset?: () => void,
-  invalidateQuery?: (query: string[]) => void
+  invalidateQuery?: (query: string[]) => void,
+  onCloseModal?: () => void
 ) {
   const { invalidateQuery: invalidateQueries } = useUseQueryClient();
 
@@ -36,6 +37,8 @@ export function useCreateCabin(
       showSuccessToast("Cabin added successfully!");
 
       finalInvalidateQuery(["cabins"]);
+
+      onCloseModal?.(); // Close the modal
 
       reset?.(); // Reset the form
     },

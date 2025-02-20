@@ -25,7 +25,13 @@ const StyledFlexContainer = styled.div`
   gap: 1.2rem;
 `;
 
-function CreateCabinForm({ cabinToEdit = {} }: { cabinToEdit?: FieldValues }) {
+function CreateCabinForm({
+  onCloseModal,
+  cabinToEdit = {},
+}: {
+  onCloseModal?: () => void;
+  cabinToEdit?: FieldValues;
+}) {
   const { id: editId, ...editValues } = cabinToEdit ?? {};
 
   const isEditSession = Boolean(editId);
@@ -48,9 +54,16 @@ function CreateCabinForm({ cabinToEdit = {} }: { cabinToEdit?: FieldValues }) {
 
   const { invalidateQuery } = useUseQueryClient();
 
-  const { isCreating, addCabin } = useCreateCabin(reset, invalidateQuery);
+  const { isCreating, addCabin } = useCreateCabin(
+    reset,
+    invalidateQuery,
+    onCloseModal
+  );
 
-  const { isUpdating, updateCabin } = useUpdateCabin(invalidateQuery);
+  const { isUpdating, updateCabin } = useUpdateCabin(
+    invalidateQuery,
+    onCloseModal
+  );
 
   function onSubmit(data: FieldValues) {
     const image = typeof data.image === "string" ? data.image : data.image[0];
@@ -67,7 +80,10 @@ function CreateCabinForm({ cabinToEdit = {} }: { cabinToEdit?: FieldValues }) {
   }
 
   return (
-    <Form onSubmit={handleSubmit(onSubmit, onError)}>
+    <Form
+      onSubmit={handleSubmit(onSubmit, onError)}
+      type={onCloseModal ? "modal" : "regular"}
+    >
       <FormRow label="Name" errorMsg={errors?.name?.message as string}>
         <Input
           type="text"
@@ -150,7 +166,11 @@ function CreateCabinForm({ cabinToEdit = {} }: { cabinToEdit?: FieldValues }) {
         />
       </FormRow>
       <StyledFlexContainer>
-        <Button variation="secondary" type="reset">
+        <Button
+          variation="secondary"
+          type="reset"
+          onClick={() => onCloseModal?.()}
+        >
           Cancel
         </Button>
         <Button disabled={isCreating || isUpdating}>
