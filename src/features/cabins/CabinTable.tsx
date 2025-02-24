@@ -6,6 +6,7 @@ import Table from "../../ui/Table";
 import { Cabin } from "../../types/cabin";
 import Menus from "../../ui/Menus";
 import { useSearchParams } from "react-router";
+import Empty from "../../ui/Empty";
 
 const StyledDiv = styled.div`
   text-align: center;
@@ -63,6 +64,8 @@ export default function CabinTable() {
   if (isFetching) {
     return <Spinner />;
   }
+
+  if (!cabins?.length) return <Empty resourceName="cabins" />;
 
   return (
     <Menus>

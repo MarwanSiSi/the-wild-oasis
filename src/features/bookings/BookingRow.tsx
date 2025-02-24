@@ -6,6 +6,7 @@ import Table from "../../ui/Table";
 
 import { formatCurrency } from "../../utils/helpers";
 import { formatDistanceFromNow } from "../../utils/helpers";
+import { Booking } from "../../types/bookings";
 
 const Cabin = styled.div`
   font-size: 1.6rem;
@@ -36,19 +37,23 @@ const Amount = styled.div`
 
 function BookingRow({
   booking: {
-    id: bookingId,
-    created_at,
+    // id: bookingId,
+    // created_at,
     startDate,
     endDate,
     numNights,
-    numGuests,
+    // numGuests,
     totalPrice,
     status,
     guests: { fullName: guestName, email },
     cabins: { name: cabinName },
   },
+}: {
+  booking: Booking;
 }) {
-  const statusToTagName = {
+  const statusToTagName: {
+    [key in Booking["status"]]: "blue" | "green" | "silver";
+  } = {
     unconfirmed: "blue",
     "checked-in": "green",
     "checked-out": "silver",
