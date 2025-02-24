@@ -3,6 +3,7 @@ import FlexContainer from "../ui/FlexContainer";
 import CabinTable from "../features/cabins/CabinTable";
 import styled from "styled-components";
 import AddCabin from "../features/cabins/AddCabin";
+import CabinTableOperations from "../features/cabins/CabinTableOperations";
 
 const StyledDiv = styled.div`
   display: flex;
@@ -17,7 +18,7 @@ function Cabins() {
       <FlexContainer orientation="horizontal">
         <StyledDiv>
           <Heading as="h1">All cabins</Heading>
-          <p>Filter / Sort</p>
+          <CabinTableOperations />
         </StyledDiv>
       </FlexContainer>
       <FlexContainer>
