@@ -1,18 +1,100 @@
-import { Booking } from "../types/bookings";
+import { PAGE_SIZE } from "../utils/constants";
 import { getToday } from "../utils/helpers";
 import supabase from "./supabase";
 
-export async function getBookings() {
-  const { data: bookings, error } = await supabase
+type SupabaseFilterMethod =
+  | "eq"
+  | "neq"
+  | "gt"
+  | "gte"
+  | "lt"
+  | "lte"
+  | "like"
+  | "ilike"
+  | "is"
+  | "in"
+  | "cs"
+  | "cd"
+  | "sl"
+  | "sr"
+  | "nxl"
+  | "nxr"
+  | "adj";
+
+type Filter = {
+  field: string; // The field to filter on (e.g., "status")
+  value: string | number | boolean | null; // The value to filter by
+  method: SupabaseFilterMethod; // The Supabase filter method
+};
+
+type Sort = {
+  field: string; // The field to sort by (e.g., "startDate")
+  direction: "asc" | "desc"; // The sort direction
+};
+
+interface GetBookingsParams {
+  filters: Filter[]; // Array of filters
+  sort: Sort[]; // Array of sort options
+}
+
+export async function getBookings(
+  filterStrings: GetBookingsParams,
+  page: number
+) {
+  let query = supabase
     .from("bookings")
-    .select("*, cabins(name), guests(fullName,email)");
+    .select("*, cabins(name), guests(fullName,email)", {
+      count: "exact",
+    });
+
+  // 1) Filters
+  filterStrings.filters.forEach(({ field, value, method }) => {
+    if (value !== "all")
+      switch (method) {
+        case "eq":
+          query = query.eq(field, value);
+          break;
+        case "neq":
+          query = query.neq(field, value);
+          break;
+        case "gt":
+          query = query.gt(field, value);
+          break;
+        case "gte":
+          query = query.gte(field, value);
+          break;
+        case "lt":
+          query = query.lt(field, value);
+          break;
+        case "lte":
+          query = query.lte(field, value);
+          break;
+        default:
+          throw new Error(`Invalid filter method: ${method}`);
+      }
+  });
+
+  // 2) SORT
+  filterStrings.sort.forEach(({ field, direction }) => {
+    query = query.order(field, { ascending: direction === "asc" });
+  });
+
+  // 3) PAGINATION
+  if (page) {
+    const from = (page - 1) * PAGE_SIZE;
+    const to = from + PAGE_SIZE - 1;
+    query = query.range(from, to);
+  }
+
+  // 4) Execute query with the given filters
+  const { data, error, count } = await query;
 
   if (error) {
     console.error(error);
     throw new Error("Bookings could not get loaded");
   }
 
-  return bookings as Booking[];
+  return { data, count };
 }
 
 export async function getBooking(id: number) {
