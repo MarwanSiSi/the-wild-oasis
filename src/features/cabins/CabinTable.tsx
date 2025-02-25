@@ -69,7 +69,7 @@ export default function CabinTable() {
 
   return (
     <Menus>
-      <Table columns="0.6fr 1.8fr 2.2fr 1fr 1fr 1fr">
+      <Table $columns="0.6fr 1.8fr 2.2fr 1fr 1fr 1fr">
         <Table.Header>
           <StyledDiv></StyledDiv>
           <StyledDiv>Cabin</StyledDiv>

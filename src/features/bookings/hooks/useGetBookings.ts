@@ -8,7 +8,7 @@ import { PAGE_SIZE } from "../../../utils/constants";
 
 export function useGetBookings() {
   const { queryClient } = useUseQueryClient();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   // Extract query parameters
   const filterValue = searchParams.get("status") || "all";
@@ -28,7 +28,10 @@ export function useGetBookings() {
 
   // Reset page to 1 when filter changes
   useEffect(() => {
-    searchParams.set("page", "1");
+    setSearchParams({
+      ...Object.fromEntries(searchParams),
+      page: "1",
+    });
   }, [filterValue]);
 
   // Fetch bookings data

@@ -1,4 +1,4 @@
-import { Filter, Sort } from "../types/bookings";
+import { Booking, Filter, Sort } from "../types/bookings";
 import { PAGE_SIZE } from "../utils/constants";
 import { getToday } from "../utils/helpers";
 import supabase from "./supabase";
@@ -161,4 +161,22 @@ export async function deleteBooking(id: number) {
     throw new Error("Booking could not be deleted");
   }
   return data;
+}
+
+export async function checkInBooking(
+  id: string,
+  obj: Partial<Record<keyof Booking, string | boolean>>
+): Promise<Booking> {
+  const { data, error } = await supabase
+    .from("bookings")
+    .update(obj)
+    .eq("id", +id)
+    .select();
+
+  if (error) {
+    console.error(error);
+    throw new Error("Booking could not be updated");
+  }
+
+  return data[0];
 }

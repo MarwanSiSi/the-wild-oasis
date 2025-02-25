@@ -1,6 +1,7 @@
 import { createBrowserRouter } from "react-router";
 import WrapWithSuspense from "../ui/WrapWithSuspense";
 import { lazy } from "react";
+import { bookingRoutes } from "./booking.routes";
 
 export const router = createBrowserRouter([
   {
@@ -23,16 +24,7 @@ export const router = createBrowserRouter([
           )
         ),
       },
-      {
-        path: "bookings",
-        element: WrapWithSuspense(
-          lazy(() =>
-            import("../pages/Bookings").then((module) => ({
-              default: module.default,
-            }))
-          )
-        ),
-      },
+      bookingRoutes,
       {
         path: "/cabins",
         element: WrapWithSuspense(

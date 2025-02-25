@@ -3,6 +3,7 @@ import styled from "styled-components";
 const StyledCheckbox = styled.div`
   display: flex;
   gap: 1.6rem;
+  align-items: center;
 
   & input[type="checkbox"] {
     height: 2.4rem;
@@ -25,7 +26,19 @@ const StyledCheckbox = styled.div`
   }
 `;
 
-function Checkbox({ checked, onChange, disabled = false, id, children }) {
+function Checkbox({
+  checked,
+  onChange,
+  disabled = false,
+  id,
+  children,
+}: {
+  checked: boolean;
+  onChange: () => void;
+  disabled?: boolean;
+  id: string;
+  children: React.ReactNode;
+}) {
   return (
     <StyledCheckbox>
       <input

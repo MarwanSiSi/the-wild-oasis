@@ -1,5 +1,5 @@
 export type Booking = {
-  id: number;
+  id: string;
   created_at: string;
   startDate: string;
   endDate: string;
@@ -8,7 +8,7 @@ export type Booking = {
   cabinPrice: number;
   extrasPrice: number;
   totalPrice: number;
-  status: string;
+  status: BookingStatus;
   hasBreakfast: boolean;
   isPaid: boolean;
   observations: string;
@@ -20,6 +20,9 @@ export type Booking = {
   guests: {
     fullName: string;
     email: string;
+    country: string;
+    countryFlag: string;
+    nationalID: string;
   };
 };
 
@@ -52,3 +55,5 @@ export type Sort = {
   field: string; // The field to sort by (e.g., "startDate")
   direction: "asc" | "desc"; // The sort direction
 };
+
+export type BookingStatus = "unconfirmed" | "checked-in" | "checked-out";
