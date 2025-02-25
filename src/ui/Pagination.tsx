@@ -115,8 +115,8 @@ export default function Pagination({ count }: { count: number }) {
           disabled={currentPage === pageCount}
           onClick={nextPage}
         >
-          <BiChevronRight />
           <span>Next</span>
+          <BiChevronRight />
         </PaginationButton>
       </Buttons>
     </StyledPagination>

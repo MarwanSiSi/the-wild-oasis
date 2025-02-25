@@ -22,3 +22,33 @@ export type Booking = {
     email: string;
   };
 };
+
+type SupabaseFilterMethod =
+  | "eq"
+  | "neq"
+  | "gt"
+  | "gte"
+  | "lt"
+  | "lte"
+  | "like"
+  | "ilike"
+  | "is"
+  | "in"
+  | "cs"
+  | "cd"
+  | "sl"
+  | "sr"
+  | "nxl"
+  | "nxr"
+  | "adj";
+
+export type Filter = {
+  field: string; // The field to filter on (e.g., "status")
+  value: string | number | boolean | null; // The value to filter by
+  method: SupabaseFilterMethod; // The Supabase filter method
+};
+
+export type Sort = {
+  field: string; // The field to sort by (e.g., "startDate")
+  direction: "asc" | "desc"; // The sort direction
+};

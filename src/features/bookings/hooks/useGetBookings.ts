@@ -1,62 +1,64 @@
 import { useQuery } from "@tanstack/react-query";
 import { getBookings } from "../../../services/apiBookings";
-import { Booking } from "../../../types/bookings";
+import { Filter, Sort } from "../../../types/bookings";
 import { useSearchParams } from "react-router";
 import { useEffect } from "react";
+import { useUseQueryClient } from "../../../hooks/useUseQueryClient";
+import { PAGE_SIZE } from "../../../utils/constants";
 
 export function useGetBookings() {
-  const [searchParams, setSearchParams] = useSearchParams();
+  const { queryClient } = useUseQueryClient();
+  const [searchParams] = useSearchParams();
 
-  // 1) Get the status filter value from the URL
+  // Extract query parameters
   const filterValue = searchParams.get("status") || "all";
-
-  // 2) Get the sortBy value from the URL
   const sortByValue = searchParams.get("sortBy") || "startDate-desc";
+  const page = Number(searchParams.get("page")) || 1;
 
-  // Extract field and direction from sortByValue
+  // Parse sortByValue into field and direction
   const [field, direction] = sortByValue.split("-");
-
-  // Ensure direction is "asc" or "desc"
   const validDirection =
     direction === "asc" || direction === "desc" ? direction : "desc";
 
-  // 3) PAGINATION
-  const page = Number(searchParams.get("page")) || 1;
+  // Define filters and sort
+  const filters: Filter[] = [
+    { field: "status", value: filterValue, method: "eq" },
+  ];
+  const sort: Sort[] = [{ field, direction: validDirection }];
 
+  // Reset page to 1 when filter changes
   useEffect(() => {
-    setSearchParams({
-      ...Object.fromEntries(searchParams),
-      page: "1",
-    });
+    searchParams.set("page", "1");
   }, [filterValue]);
 
-  const { data, isPending: isFetching } = useQuery<{
-    bookings: Booking[];
-    count: number;
-  }>({
-    queryKey: [
-      "bookings",
-      { field: "status", value: filterValue },
-      { field, direction: validDirection },
-      page,
-    ],
+  // Fetch bookings data
+  const { data, isPending: isFetching } = useQuery({
+    queryKey: ["bookings", filterValue, field, validDirection, page],
     queryFn: async () => {
-      const response = await getBookings(
-        {
-          filters: [{ field: "status", value: filterValue, method: "eq" }],
-          sort: [
-            {
-              field,
-              direction: validDirection, // Use the validated direction
-            },
-          ],
-        },
-        page
-      );
-
+      const response = await getBookings({ filters, sort }, page);
       return { bookings: response.data, count: response.count ?? 0 };
     },
   });
 
-  return { bookings: data?.bookings, count: data?.count, isFetching };
+  // Pre-fetch next and previous pages
+  const pageCount = Math.ceil((data?.count ?? 0) / PAGE_SIZE);
+
+  const prefetchPage = async (pageNumber: number) => {
+    await queryClient.prefetchQuery({
+      queryKey: ["bookings", filterValue, field, validDirection, pageNumber],
+      queryFn: async () => {
+        const response = await getBookings({ filters, sort }, pageNumber);
+        return { bookings: response.data, count: response.count ?? 0 };
+      },
+    });
+  };
+
+  if (page < pageCount) prefetchPage(page + 1); // Pre-fetch next page
+  if (page > 1) prefetchPage(page - 1); // Pre-fetch previous page
+
+  return {
+    bookings: data?.bookings,
+    count: data?.count,
+    isFetching,
+  };
 }

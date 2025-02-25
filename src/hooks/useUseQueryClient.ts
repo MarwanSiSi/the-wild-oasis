@@ -9,5 +9,5 @@ export function useUseQueryClient() {
     });
   }
 
-  return { invalidateQuery };
+  return { invalidateQuery, queryClient };
 }
