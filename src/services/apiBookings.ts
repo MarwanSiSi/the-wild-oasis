@@ -137,35 +137,45 @@ export async function getStaysTodayActivity() {
   return data;
 }
 
-// export async function updateBooking(id: number, obj) {
-//   const { data, error } = await supabase
-//     .from("bookings")
-//     .update(obj)
-//     .eq("id", id)
-//     .select()
-//     .single();
+export async function updateBooking(
+  id: number,
+  obj: Partial<Record<keyof Booking, string | boolean | number>>
+) {
+  const { data, error } = await supabase
+    .from("bookings")
+    .update(obj)
+    .eq("id", id)
+    .select()
+    .single();
 
-//   if (error) {
-//     console.error(error);
-//     throw new Error("Booking could not be updated");
-//   }
-//   return data;
-// }
+  if (error) {
+    console.error(error);
+    throw new Error("Booking could not be updated");
+  }
+  return data;
+}
 
-export async function deleteBooking(id: number) {
+export async function deleteBooking(id: number): Promise<Booking> {
   // REMEMBER RLS POLICIES
-  const { data, error } = await supabase.from("bookings").delete().eq("id", id);
+  const { data, error } = await supabase
+    .from("bookings")
+    .delete()
+    .eq("id", id)
+    .select()
+    .single();
+  console.log(data);
 
   if (error) {
     console.error(error);
     throw new Error("Booking could not be deleted");
   }
+
   return data;
 }
 
 export async function checkInBooking(
-  id: string,
-  obj: Partial<Record<keyof Booking, string | boolean>>
+  id: number,
+  obj: Partial<Record<keyof Booking, string | boolean | number>>
 ): Promise<Booking> {
   const { data, error } = await supabase
     .from("bookings")

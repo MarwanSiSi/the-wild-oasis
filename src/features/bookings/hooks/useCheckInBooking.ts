@@ -1,24 +1,28 @@
 import { useMutation } from "@tanstack/react-query";
-import { checkInBooking } from "../../../services/apiBookings";
-import { showLoadingToast } from "../../../utils/helpers";
+import {
+  showErrorToast,
+  showLoadingToast,
+  showSuccessToast,
+} from "../../../utils/helpers";
 import { toast } from "sonner";
 import { useUseQueryClient } from "../../../hooks/useUseQueryClient";
 
 import { useNavigate } from "react-router";
 import { Booking } from "../../../types/bookings";
+import { checkInBooking } from "../../../services/apiBookings";
 
-export function useUpdateBooking() {
+export function useCheckInBooking() {
   const navigate = useNavigate();
 
   const { invalidateQuery } = useUseQueryClient();
 
-  const { mutate: updateBooking, isPending: isCheckingIn } = useMutation({
+  const { mutate: checkIn, isPending: isCheckingIn } = useMutation({
     mutationFn: ({
       id,
       data,
     }: {
-      id: string;
-      data: { [key: string]: string | boolean };
+      id: number;
+      data: Partial<Record<keyof Booking, string | boolean | number>>;
     }) => checkInBooking(id, data),
 
     onMutate: () => {
@@ -30,7 +34,7 @@ export function useUpdateBooking() {
     onSuccess: (data: Booking, __, context) => {
       toast.dismiss(context.loadingToastId);
 
-      toast.success(`Booking #${data.id} was successfully checked in.`);
+      showSuccessToast(`Booking #${data.id} was successfully checked in.`);
 
       invalidateQuery(undefined, { active: true });
 
@@ -40,9 +44,9 @@ export function useUpdateBooking() {
     onError: (_, __, context) => {
       toast.dismiss(context?.loadingToastId);
 
-      toast.error("Failed to check in booking.");
+      showErrorToast("Failed to check in booking.");
     },
   });
 
-  return { updateBooking, isCheckingIn };
+  return { checkIn, isCheckingIn };
 }

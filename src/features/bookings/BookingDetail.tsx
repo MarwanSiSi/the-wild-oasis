@@ -13,6 +13,10 @@ import { useNavigate } from "react-router";
 import { useGetBooking } from "./hooks/useGetBooking";
 import Spinner from "../../ui/Spinner";
 import { BookingStatus } from "../../types/bookings";
+import { useDeleteBooking } from "./hooks/useDeleteBooking";
+import CheckoutButton from "../check-in-out/CheckoutButton";
+import Modal from "../../ui/Modal";
+import ConfirmDelete from "../../ui/ConfirmDelete";
 
 const HeadingGroup = styled.div`
   display: flex;
@@ -24,6 +28,7 @@ function BookingDetail() {
   const navigate = useNavigate();
 
   const { booking, isFetching } = useGetBooking();
+  const { removeBooking, isDeleting } = useDeleteBooking();
 
   const status: BookingStatus = booking?.status ?? "unconfirmed";
 
@@ -41,6 +46,12 @@ function BookingDetail() {
     navigate(`check-in`);
   }
 
+  function handleDeleteBooking() {
+    removeBooking(booking?.id ? +booking.id : 0);
+
+    navigate("/bookings");
+  }
+
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "2.4rem" }}>
       <FlexContainer orientation="horizontal">
@@ -53,17 +64,36 @@ function BookingDetail() {
 
       {booking ? <BookingDataBox booking={booking} /> : null}
 
-      <ButtonGroup>
-        {status === "unconfirmed" ? (
-          <Button disabled={booking?.isPaid} onClick={handleCheckInClick}>
-            Check in
-          </Button>
-        ) : null}
+      <Modal>
+        <ButtonGroup>
+          <Modal.Open opens="delete-booking">
+            <Button
+              disabled={booking?.status === "checked-in"}
+              variation="danger"
+            >
+              Delete Booking
+            </Button>
+          </Modal.Open>
 
-        <Button variation="secondary" onClick={moveBack}>
-          Back
-        </Button>
-      </ButtonGroup>
+          {status === "unconfirmed" ? (
+            <Button onClick={handleCheckInClick}>Check in</Button>
+          ) : status === "checked-in" ? (
+            <CheckoutButton bookingId={booking?.id ? booking.id : ""} />
+          ) : null}
+
+          <Button variation="secondary" onClick={moveBack}>
+            Back
+          </Button>
+        </ButtonGroup>
+
+        <Modal.Window name="delete-booking">
+          <ConfirmDelete
+            onConfirm={handleDeleteBooking}
+            resourceName={`booking ${booking?.id}`}
+            disabled={isDeleting}
+          />
+        </Modal.Window>
+      </Modal>
     </div>
   );
 }

@@ -48,6 +48,7 @@ export default function Filter({ filterField, options }: FilterProps) {
     setSearchParams({
       ...Object.fromEntries(searchParams.entries()),
       [filterField]: value,
+      page: "1",
     });
   }
 

@@ -3,6 +3,7 @@ import styled from "styled-components";
 
 interface CommonRowProps {
   $columns: string;
+  disabled?: boolean;
 }
 
 const StyledTable = styled.div`
@@ -34,6 +35,7 @@ const StyledHeader = styled(CommonRow)`
 `;
 
 const StyledRow = styled(CommonRow)`
+  ${(props) => (props.disabled ? `opacity: 0.5;` : "")}
   padding: 1.2rem 2.4rem;
 
   &:not(:last-child) {
@@ -96,11 +98,17 @@ function Header({ children }: { children: React.ReactNode }) {
   );
 }
 
-function Row({ children }: { children: React.ReactNode }) {
+function Row({
+  children,
+  disabled,
+}: {
+  children: React.ReactNode;
+  disabled?: boolean;
+}) {
   const { $columns } = useContext(TableContext);
 
   return (
-    <StyledRow $columns={$columns} role="row">
+    <StyledRow disabled={disabled} $columns={$columns} role="row">
       {children}
     </StyledRow>
   );

@@ -2,13 +2,12 @@ import { useQuery } from "@tanstack/react-query";
 import { getBookings } from "../../../services/apiBookings";
 import { Filter, Sort } from "../../../types/bookings";
 import { useSearchParams } from "react-router";
-import { useEffect } from "react";
 import { useUseQueryClient } from "../../../hooks/useUseQueryClient";
 import { PAGE_SIZE } from "../../../utils/constants";
 
 export function useGetBookings() {
   const { queryClient } = useUseQueryClient();
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams] = useSearchParams();
 
   // Extract query parameters
   const filterValue = searchParams.get("status") || "all";
@@ -25,14 +24,6 @@ export function useGetBookings() {
     { field: "status", value: filterValue, method: "eq" },
   ];
   const sort: Sort[] = [{ field, direction: validDirection }];
-
-  // Reset page to 1 when filter changes
-  useEffect(() => {
-    setSearchParams({
-      ...Object.fromEntries(searchParams),
-      page: "1",
-    });
-  }, [filterValue]);
 
   // Fetch bookings data
   const { data, isPending: isFetching } = useQuery({

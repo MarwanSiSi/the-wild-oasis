@@ -47,6 +47,7 @@ function ConfirmDelete({
         >
           Cancel
         </Button>
+        {/* AFTER DELETING THE ROW NO LONGER EXISTS, THEREFORE NO NEED TO CALL ONCLOSE MODAL (MODAL WILL AUTOMATICALLY CLOSE) */}
         <Button variation="danger" disabled={disabled} onClick={onConfirm}>
           Delete
         </Button>
