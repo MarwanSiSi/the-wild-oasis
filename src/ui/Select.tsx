@@ -1,8 +1,8 @@
 import styled from "styled-components";
-import React from "react";
+import { SelectHTMLAttributes } from "react";
 
 // Define the props interface for Select
-interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
+interface SelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
   options: { value: string; label: string }[];
   activeValue: string;
   type?: string;

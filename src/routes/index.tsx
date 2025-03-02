@@ -2,16 +2,31 @@ import { createBrowserRouter } from "react-router";
 import WrapWithSuspense from "../ui/WrapWithSuspense";
 import { lazy } from "react";
 import { bookingRoutes } from "./booking.routes";
+import ProtectedRoute from "../ui/ProtectedRoute";
 
 export const router = createBrowserRouter([
   {
-    path: "/",
+    path: "/login",
     element: WrapWithSuspense(
       lazy(() =>
-        import("../ui/AppLayout").then((module) => ({
+        import("../pages/Login").then((module) => ({
           default: module.default,
         }))
       )
+    ),
+  },
+  {
+    path: "/",
+    element: (
+      <ProtectedRoute>
+        {WrapWithSuspense(
+          lazy(() =>
+            import("../ui/AppLayout").then((module) => ({
+              default: module.default,
+            }))
+          )
+        )}
+      </ProtectedRoute>
     ),
     children: [
       {
@@ -60,16 +75,6 @@ export const router = createBrowserRouter([
         element: WrapWithSuspense(
           lazy(() =>
             import("../pages/Account").then((module) => ({
-              default: module.default,
-            }))
-          )
-        ),
-      },
-      {
-        path: "/login",
-        element: WrapWithSuspense(
-          lazy(() =>
-            import("../pages/Login").then((module) => ({
               default: module.default,
             }))
           )

@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import Logout from "../features/authentication/Logout";
 
 const StyledNav = styled.nav`
   background-color: var(--color-gray-0);
@@ -7,5 +8,9 @@ const StyledNav = styled.nav`
 `;
 
 export default function Navbar() {
-  return <StyledNav>Navbar</StyledNav>;
+  return (
+    <StyledNav>
+      <Logout />
+    </StyledNav>
+  );
 }

@@ -25,6 +25,8 @@ const StyledFormRow = styled.div`
     justify-content: flex-end;
     gap: 1.2rem;
   }
+
+  margin-top: 0.4rem;
 `;
 
 const Label = styled.label`
@@ -34,6 +36,7 @@ const Label = styled.label`
 const Error = styled.span`
   font-size: 1.4rem;
   color: var(--color-red-700);
+  width: 100%;
 `;
 
 export default function FormRow({

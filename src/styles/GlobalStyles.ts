@@ -1,6 +1,10 @@
 import { createGlobalStyle } from "styled-components";
 
 const GlobalStyles = createGlobalStyle`
+
+@import "tailwindcss";
+
+
 :root {
   /* Indigo */
   --color-brand-50: #eef2ff;

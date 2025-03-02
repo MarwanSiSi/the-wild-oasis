@@ -23,6 +23,8 @@ const StyledFlexContainer = styled.div`
   display: flex;
   justify-content: flex-end;
   gap: 1.2rem;
+  margin-top: 2.4rem;
+  margin-bottom: 0.4rem;
 `;
 
 function CreateCabinForm({

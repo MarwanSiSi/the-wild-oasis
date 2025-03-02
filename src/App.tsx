@@ -8,13 +8,14 @@ import { Toaster } from "sonner";
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 60_000,
+      staleTime: 30_000, // Data becomes stale after 30 seconds
+      refetchOnWindowFocus: true, // Refetch when the window regains focus
+      refetchOnReconnect: true, // Refetch when the network reconnects
+      refetchInterval: 30_000, // Refetch every 30 seconds (same as staleTime)
+      refetchIntervalInBackground: false, // Only refetch when the app is in the foreground
     },
   },
 });
-
-// isLoading -> isPending
-// cacheTime -> gcTime
 
 function App() {
   return (

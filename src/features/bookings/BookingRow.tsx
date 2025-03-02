@@ -10,11 +10,16 @@ import { Booking } from "../../types/bookings";
 import Menus from "../../ui/Menus";
 import { HiEye, HiTrash } from "react-icons/hi";
 import { useNavigate } from "react-router";
-import { HiArrowDownOnSquare, HiArrowUpOnSquare } from "react-icons/hi2";
+import {
+  HiArrowDownOnSquare,
+  HiArrowUpOnSquare,
+  HiPencil,
+} from "react-icons/hi2";
 import { useCheckoutBooking } from "./hooks/useCheckoutBooking";
 import { useDeleteBooking } from "./hooks/useDeleteBooking";
 import Modal from "../../ui/Modal";
 import ConfirmDelete from "../../ui/ConfirmDelete";
+import BookingForm from "./BookingForm";
 
 const Cabin = styled.div`
   font-size: 1.6rem;
@@ -128,6 +133,12 @@ function BookingRow({
               View details
             </Menus.Button>
 
+            {status === "unconfirmed" && (
+              <Modal.Open opens="edit-booking">
+                <Menus.Button icon={<HiPencil />}>Edit Booking</Menus.Button>
+              </Modal.Open>
+            )}
+
             {status === "unconfirmed" ? (
               <Menus.Button
                 icon={<HiArrowDownOnSquare />}
@@ -160,6 +171,10 @@ function BookingRow({
             resourceName={`booking #${bookingId}`}
             disabled={isDeleting}
           />
+        </Modal.Window>
+
+        <Modal.Window name="edit-booking">
+          <BookingForm />
         </Modal.Window>
       </Modal>
     </Table.Row>
