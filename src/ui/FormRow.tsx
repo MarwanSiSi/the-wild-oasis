@@ -44,8 +44,8 @@ export default function FormRow({
   errorMsg,
   children,
 }: {
-  label: string;
-  errorMsg: string;
+  label?: string;
+  errorMsg?: string;
   children: React.ReactElement<HTMLInputElement>;
 }) {
   return (
