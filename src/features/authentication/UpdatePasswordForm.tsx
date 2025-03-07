@@ -4,29 +4,36 @@ import Form from "../../ui/Form";
 import FormRow from "../../ui/FormRow";
 import Input from "../../ui/Input";
 
-import { useUpdateUser } from "./useUpdateUser";
+import { useUpdateUser } from "./hooks/useUpdateUser";
+
+interface FormData {
+  password: string;
+  passwordConfirm: string;
+}
 
 function UpdatePasswordForm() {
-  const { register, handleSubmit, formState, getValues, reset } = useForm();
+  const { register, handleSubmit, formState, getValues, reset } =
+    useForm<FormData>();
   const { errors } = formState;
 
-  const { updateUser, isUpdating } = useUpdateUser();
+  const { updateUser, isUpdatingUser } = useUpdateUser();
 
-  function onSubmit({ password }) {
-    updateUser({ password }, { onSuccess: reset });
+  function onSubmit({ password }: { password: string }) {
+    console.log({ data: { password } });
+    updateUser({ data: { password } }, { onSuccess: () => reset() });
   }
 
   return (
     <Form onSubmit={handleSubmit(onSubmit)}>
       <FormRow
         label="Password (min 8 characters)"
-        error={errors?.password?.message}
+        errorMsg={errors?.password?.message}
       >
         <Input
           type="password"
           id="password"
           autoComplete="current-password"
-          disabled={isUpdating}
+          disabled={isUpdatingUser}
           {...register("password", {
             required: "This field is required",
             minLength: {
@@ -39,13 +46,13 @@ function UpdatePasswordForm() {
 
       <FormRow
         label="Confirm password"
-        error={errors?.passwordConfirm?.message}
+        errorMsg={errors?.passwordConfirm?.message}
       >
         <Input
           type="password"
           autoComplete="new-password"
           id="passwordConfirm"
-          disabled={isUpdating}
+          disabled={isUpdatingUser}
           {...register("passwordConfirm", {
             required: "This field is required",
             validate: (value) =>
@@ -54,10 +61,12 @@ function UpdatePasswordForm() {
         />
       </FormRow>
       <FormRow>
-        <Button onClick={reset} type="reset" variation="secondary">
-          Cancel
-        </Button>
-        <Button disabled={isUpdating}>Update password</Button>
+        <>
+          <Button onClick={() => reset()} type="reset" variation="secondary">
+            Cancel
+          </Button>
+          <Button disabled={isUpdatingUser}>Update password</Button>
+        </>
       </FormRow>
     </Form>
   );

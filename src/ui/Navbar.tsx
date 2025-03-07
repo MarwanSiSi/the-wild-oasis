@@ -1,16 +1,23 @@
 import styled from "styled-components";
-import Logout from "../features/authentication/Logout";
+import NavbarMenu from "./NavbarMenu";
+import UserAvatar from "../features/authentication/UserAvatar";
 
 const StyledNav = styled.nav`
   background-color: var(--color-gray-0);
   padding: 1.2rem 4.8rem;
   border: 1px solid var(--color-gray-100);
+
+  display: flex;
+  gap: 2.4rem;
+  align-items: center;
+  justify-content: end;
 `;
 
 export default function Navbar() {
   return (
     <StyledNav>
-      <Logout />
+      <UserAvatar />
+      <NavbarMenu />
     </StyledNav>
   );
 }
