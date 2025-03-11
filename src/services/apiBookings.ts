@@ -96,7 +96,11 @@ export async function getBookingsAfterDate(date: string) {
     throw new Error("Bookings could not get loaded");
   }
 
-  return data;
+  return data.map((item) => ({
+    created_at: item.created_at as string,
+    totalPrice: item.totalPrice as number,
+    extrasPrice: item.extrasPrice as number,
+  }));
 }
 
 // Returns all STAYS that are were created after the given date

@@ -1,3 +1,4 @@
+import { JSX } from "react";
 import styled from "styled-components";
 
 const StyledStat = styled.div`
@@ -47,7 +48,17 @@ const Value = styled.p`
   font-weight: 500;
 `;
 
-function Stat({ icon, title, value, color }) {
+function Stat({
+  icon,
+  title,
+  value,
+  color,
+}: {
+  icon: JSX.Element;
+  title: string;
+  value: string;
+  color: string;
+}) {
   return (
     <StyledStat>
       <Icon color={color}>{icon}</Icon>
