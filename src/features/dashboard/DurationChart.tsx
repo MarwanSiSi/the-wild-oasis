@@ -1,4 +1,14 @@
 import styled from "styled-components";
+import Heading from "../../ui/Heading";
+import {
+  Cell,
+  Legend,
+  Pie,
+  PieChart,
+  ResponsiveContainer,
+  Tooltip,
+} from "recharts";
+import { useDarkMode } from "../../context/DarkModeContext";
 
 const ChartBox = styled.div`
   /* Box */
@@ -104,10 +114,20 @@ const startDataDark = [
   },
 ];
 
-function prepareData(startData, stays) {
+interface Stay {
+  numNights: number;
+}
+
+interface Data {
+  duration: string;
+  value: number;
+  color: string;
+}
+
+function prepareData(startData: Data[], stays: Stay[]): Data[] {
   // A bit ugly code, but sometimes this is what it takes when working with real data 😅
 
-  function incArrayValue(arr, field) {
+  function incArrayValue(arr: Data[], field: string): Data[] {
     return arr.map((obj) =>
       obj.duration === field ? { ...obj, value: obj.value + 1 } : obj
     );
@@ -129,4 +149,68 @@ function prepareData(startData, stays) {
     .filter((obj) => obj.value > 0);
 
   return data;
+}
+
+export default function DurationChart({
+  confirmedStays,
+}: {
+  confirmedStays: Stay[];
+}) {
+  const { isDarkMode } = useDarkMode();
+  const startData = isDarkMode ? startDataDark : startDataLight;
+
+  const data = prepareData(startData, confirmedStays);
+
+  return (
+    <ChartBox>
+      <Heading as="h2">Stay duration summary</Heading>
+      <ResponsiveContainer width="100%" height={240}>
+        <PieChart>
+          <Pie
+            data={data}
+            dataKey="value"
+            nameKey="duration"
+            innerRadius={85}
+            outerRadius={110}
+            cx="40%"
+            cy="50%"
+            paddingAngle={3}
+          >
+            {data.map((entry) => (
+              <Cell
+                key={entry.duration}
+                fill={entry.color}
+                stroke={entry.color}
+              />
+            ))}
+          </Pie>
+          <Tooltip
+            formatter={(value, name) => [`${value} stays`, `${name}`]}
+            contentStyle={{
+              backgroundColor: "var(--color-grey-0)",
+              borderColor: "var(--color-grey-100)",
+              borderRadius: "var(--border-radius-sm)",
+              padding: "0.8rem 1.2rem",
+              boxShadow: "var(--shadow-sm)",
+            }}
+            itemStyle={{
+              color: "var(--color-grey-700)",
+            }}
+            labelStyle={{
+              color: "var(--color-grey-900)",
+              fontWeight: 500,
+              marginBottom: "0.4rem",
+            }}
+          />
+          <Legend
+            verticalAlign="middle"
+            align="right"
+            layout="vertical"
+            iconSize={15}
+            iconType="circle"
+          />
+        </PieChart>
+      </ResponsiveContainer>
+    </ChartBox>
+  );
 }
