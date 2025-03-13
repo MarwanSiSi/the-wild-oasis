@@ -2,6 +2,9 @@ import styled from "styled-components";
 
 import Heading from "../../ui/Heading";
 import FlexContainer from "../../ui/FlexContainer";
+import { useTodaysActivities } from "./hooks/useTodaysActivities";
+import Spinner from "../../ui/Spinner";
+import TodayItem from "./TodayItem";
 
 const StyledToday = styled.div`
   /* Box */
@@ -17,33 +20,50 @@ const StyledToday = styled.div`
   padding-top: 2.4rem;
 `;
 
-// const TodayList = styled.ul`
-//   overflow: scroll;
-//   overflow-x: hidden;
+const TodayList = styled.ul`
+  overflow: scroll;
+  overflow-x: hidden;
 
-//   /* Removing scrollbars for webkit, firefox, and ms, respectively */
-//   &::-webkit-scrollbar {
-//     width: 0 !important;
-//   }
-//   scrollbar-width: none;
-//   -ms-overflow-style: none;
-// `;
+  /* Removing scrollbars for webkit, firefox, and ms, respectively */
+  &::-webkit-scrollbar {
+    width: 0 !important;
+  }
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+`;
 
-// const NoActivity = styled.p`
-//   text-align: center;
-//   font-size: 1.8rem;
-//   font-weight: 500;
-//   margin-top: 0.8rem;
-// `;
+const NoActivity = styled.p`
+  text-align: center;
+  font-size: 1.8rem;
+  font-weight: 500;
+  margin-top: 0.8rem;
+`;
 
-function Today() {
+function TodayActivity() {
+  const { activities, isPending: isFetchingTodaysActivities } =
+    useTodaysActivities();
+
   return (
     <StyledToday>
       <FlexContainer orientation="horizontal">
         <Heading as="h2">Today</Heading>
       </FlexContainer>
+
+      {!isFetchingTodaysActivities ? (
+        activities && activities.length > 0 ? (
+          <TodayList>
+            {activities.map((activity) => (
+              <TodayItem key={activity.id} activity={activity} />
+            ))}
+          </TodayList>
+        ) : (
+          <NoActivity>No activities today</NoActivity>
+        )
+      ) : (
+        <Spinner />
+      )}
     </StyledToday>
   );
 }
 
-export default Today;
+export default TodayActivity;
