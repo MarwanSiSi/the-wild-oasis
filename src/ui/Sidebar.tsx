@@ -1,7 +1,6 @@
 import styled from "styled-components";
 import Logo from "./Logo";
 import MainNav from "./MainNav";
-import Uploader from "../data/Uploader";
 
 const StyledAside = styled.aside`
   grid-row: 1 / -1;
@@ -18,8 +17,6 @@ export default function Sidebar() {
     <StyledAside>
       <Logo />
       <MainNav />
-
-      <Uploader />
     </StyledAside>
   );
 }
